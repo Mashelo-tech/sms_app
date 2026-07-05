@@ -1,5 +1,7 @@
 package com.schoolsystem.sms.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,13 +22,15 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String regNumber; // Unique Registration Number
+    @NotBlank(message = "Registration Number cannot be empty")
+    private String registrationNumber;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Full Name is required")
     private String fullName;
 
-    private String gender; // M/F
+    @NotBlank(message = "Gender must be specified")
+    @Pattern(regexp = "^(MALE|FEMALE)$", message = "Invalid gender input")
+    private String gender;
 
     private LocalDate dateOfBirth;
     

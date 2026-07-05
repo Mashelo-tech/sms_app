@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure SMS - Faculty & Staff Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        body, html {
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f7f6;
+        }
+        
+        .split-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Side: Branding & Imagery */
+        .brand-section {
+            flex: 1;
+            /* Replace this URL with an actual photo of a school building or campus */
+            background: linear-gradient(135deg, rgba(14, 30, 64, 0.88) 0%, rgba(14, 30, 64, 0.75) 100%), 
+                        url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            position: relative;
+        }
+
+        .brand-section h1 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .brand-section p {
+            font-size: 1.25rem;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+
+        /* Right Side: The Login Form */
+        .form-section {
+            width: 100%;
+            max-width: 550px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .form-control {
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            background-color: white;
+            border-color: #0e1e40;
+            box-shadow: 0 0 0 0.25rem rgba(14, 30, 64, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: #0e1e40;
+            border-color: #0e1e40;
+            padding: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a3673;
+            border-color: #1a3673;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 30, 64, 0.2);
+        }
+
+        .system-badge {
+            display: inline-block;
+            padding: 0.35rem 0.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 991px) {
+            .brand-section {
+                display: none; /* Hide image on small screens to focus on login */
+            }
+            .form-section {
+                max-width: 100%;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-layout">
+        
+        <div class="brand-section">
+            <div>
+                <span class="system-badge"><i class="bi bi-shield-lock-fill me-2"></i>Secure Access Portal</span>
+                <h1>Excellence Academy</h1>
+                <p>Welcome to the Secure School Management System. Please log in with your authorized credentials to access student records, grading broadsheets, and administrative tools.</p>
+            </div>
+            
+            <div style="position: absolute; bottom: 2rem; opacity: 0.6; font-size: 0.85rem;">
+                &copy; <script>document.write(new Date().getFullYear())</script> Excellence Academy. All rights reserved.
+            </div>
+        </div>
+
+        <div class="form-section">
+            
+            <div class="d-block d-lg-none mb-4 text-center">
+                <h3 class="fw-bold" style="color: #0e1e40;">Excellence Academy</h3>
+                <p class="text-muted small">Secure Management System</p>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="fw-bold mb-2">Sign In</h2>
+                <p class="text-muted">Enter your username and password below.</p>
+            </div>
+
+            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+                <div>
+                    <strong>Authentication Failed</strong><br>
+                    <span class="small">The username or password you entered is incorrect.</span>
+                </div>
+            </div>
+
+            <div th:if="${param.logout}" class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+                <div>
+                    <strong>Logged Out</strong><br>
+                    <span class="small">You have securely ended your session.</span>
+                </div>
+            </div>
+
+            <form th:action="@{/login}" method="POST">
+                
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="username" name="username" placeholder="e.g. admin" required autofocus>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label for="password" class="form-label mb-0">Password</label>
+                        <a href="#" class="text-decoration-none small fw-semibold" style="color: #0e1e40;">Need help?</a>
+                    </div>
+                    <div class="input-group mt-2">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                        Secure Sign In <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </div>
+
+            </form>
+            
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

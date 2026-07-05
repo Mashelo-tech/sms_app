@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure SMS - Faculty Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f6f9; }
+        .sidebar { min-height: 100vh; box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1); }
+        .nav-link { color: #cfd8dc; font-weight: 500; padding: 0.75rem 1rem; margin-bottom: 0.25rem; border-radius: 0.375rem; }
+        .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,0.1); }
+        .nav-link i { margin-right: 0.5rem; }
+        .card { border: none; border-radius: 0.5rem; }
+        .table th { font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse p-3">
+            <a href="/" class="d-flex align-items-center mb-4 text-white text-decoration-none">
+                <i class="bi bi-mortarboard-fill fs-3 me-2 text-primary"></i>
+                <span class="fs-5 fw-bold">Secure SMS</span>
+            </a>
+            
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#studentModal">
+                        <i class="bi bi-person-plus"></i> Register Student
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/teachers" class="nav-link active">
+                        <i class="bi bi-briefcase"></i> Manage Teachers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/users" class="nav-link">
+                        <i class="bi bi-people"></i> System Users
+                    </a>
+                </li>
+            </ul>
+
+            <hr class="text-secondary mt-5">
+            
+            <form th:action="@{/logout}" method="post" class="w-100">
+                <button type="submit" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                </button>
+            </form>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                <h1 class="h2 text-dark fw-bold">Faculty Management</h1>
+                <button class="btn btn-primary">
+                    <i class="bi bi-person-plus-fill me-1"></i> Add New Teacher
+                </button>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-secondary fw-bold"><i class="bi bi-person-vcard me-2"></i>Registered Faculty</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-secondary">
+                                <tr>
+                                    <th class="ps-4">Employee ID</th>
+                                    <th>Full Name</th>
+                                    <th>Department</th>
+                                    <th>Main Subject</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="teacher : ${teachers}">
+                                    <td class="ps-4 fw-bold text-primary" th:text="${teacher.employeeId}">EMP-001</td>
+                                    <td th:text="${teacher.fullName}">Jane Doe</td>
+                                    <td th:text="${teacher.department}">Sciences</td>
+                                    <td th:text="${teacher.mainSubject}">Physics</td>
+                                    <td>
+                                        <span class="badge bg-success" th:if="${teacher.active}">Active</span>
+                                        <span class="badge bg-danger" th:unless="${teacher.active}">On Leave</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(teachers)}">
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        No teachers registered yet. Click "Add New Teacher" to onboard staff.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="teacherModal" tabindex="-1" aria-labelledby="teacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="teacherModalLabel"><i class="bi bi-person-plus me-2"></i>Add New Teacher</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form th:action="@{/register-teacher}" method="POST" th:object="${teacher}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Employee ID</label>
+                        <input type="text" th:field="*{employeeId}" class="form-control bg-light" placeholder="e.g. EMP-2026-001" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Full Name</label>
+                        <input type="text" th:field="*{fullName}" class="form-control bg-light" placeholder="e.g. John Doe" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Department</label>
+                        <input type="text" th:field="*{department}" class="form-control bg-light" placeholder="e.g. Sciences" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Main Subject</label>
+                        <input type="text" th:field="*{mainSubject}" class="form-control bg-light" placeholder="e.g. Physics" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

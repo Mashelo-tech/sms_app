@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.List;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-    Optional<Student> findByRegNumber(String regNumber);
+    // Add this line so Spring knows how to check for duplicate registration numbers
+    boolean existsByRegistrationNumber(String regNumber); 
+    Optional<Student> findByRegistrationNumber(String regNumber);
     List<Student> findByCurrentClass(ClassLevel currentClass);
 }
