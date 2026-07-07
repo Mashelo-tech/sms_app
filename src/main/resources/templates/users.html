@@ -7,36 +7,7 @@
     <title>Secure SMS â€“ System Users</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        :root { --sidebar-width:250px; --sidebar-bg:#0f172a; --sidebar-accent:#3b82f6; }
-        body { background-color:#f1f5f9; font-family:'Segoe UI',system-ui,sans-serif; }
-        .sidebar { width:var(--sidebar-width); min-height:100vh; background:var(--sidebar-bg); position:fixed; top:0; left:0; display:flex; flex-direction:column; padding:1.5rem 1rem; z-index:100; }
-        .sidebar-brand { display:flex; align-items:center; gap:0.6rem; color:#fff; font-size:1.1rem; font-weight:700; text-decoration:none; margin-bottom:2rem; padding:0.5rem; }
-        .sidebar-brand .brand-icon { background:var(--sidebar-accent); width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#fff; flex-shrink:0; }
-        .nav-section-label { font-size:0.65rem; font-weight:700; letter-spacing:1px; color:#475569; text-transform:uppercase; padding:0.5rem 0.75rem; margin-top:1rem; }
-        .sidebar-nav .nav-link { color:#94a3b8; border-radius:8px; padding:0.65rem 0.75rem; margin-bottom:2px; display:flex; align-items:center; gap:0.65rem; font-size:0.875rem; font-weight:500; transition:all 0.15s; }
-        .sidebar-nav .nav-link:hover { color:#f1f5f9; background:rgba(255,255,255,0.07); }
-        .sidebar-nav .nav-link.active { color:#fff; background:var(--sidebar-accent); }
-        .sidebar-footer { margin-top:auto; padding-top:1rem; border-top:1px solid #1e293b; }
-        .user-pill { background:#1e293b; border-radius:10px; padding:0.75rem; margin-bottom:0.75rem; }
-        .user-pill .role-badge { font-size:0.65rem; font-weight:700; letter-spacing:0.5px; background:var(--sidebar-accent); color:#fff; padding:2px 7px; border-radius:99px; text-transform:uppercase; }
-        .main-content { margin-left:var(--sidebar-width); padding:2rem; min-height:100vh; }
-        .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.75rem; }
-        .topbar h1 { font-size:1.6rem; font-weight:700; color:#0f172a; margin:0; }
-        .data-card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
-        .data-card-header { padding:1rem 1.5rem; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
-        .data-card-header h5 { margin:0; font-size:0.9rem; font-weight:700; color:#334155; }
-        .table { margin:0; }
-        .table thead th { background:#f8fafc; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; border-bottom:1px solid #e2e8f0; padding:0.75rem 1rem; }
-        .table tbody td { padding:0.85rem 1rem; vertical-align:middle; border-color:#f1f5f9; font-size:0.875rem; color:#334155; }
-        .table tbody tr:hover { background:#f8fafc; }
-        .role-chip { display:inline-block; padding:3px 10px; border-radius:99px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; }
-        .role-SUPER_DOS   { background:#fde8ff; color:#9333ea; }
-        .role-DOS         { background:#dbeafe; color:#1d4ed8; }
-        .role-HEADTEACHER { background:#dcfce7; color:#15803d; }
-        .role-SECRETARY   { background:#fef3c7; color:#b45309; }
-        .role-TEACHER     { background:#f1f5f9; color:#475569; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
