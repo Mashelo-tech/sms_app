@@ -19,7 +19,7 @@ public class ClassLevel {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name; // e.g. "Senior 1"
+    private String name; // e.g. "Primary 1"
 
     private int levelOrder; // e.g. 1 for S1, 2 for S2 (for sorting)
 }

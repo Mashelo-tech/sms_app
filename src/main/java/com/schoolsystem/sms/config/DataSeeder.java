@@ -42,28 +42,24 @@ public class DataSeeder {
             // --- Seed Class Levels ---
             if (classLevelRepository.count() == 0) {
                 classLevelRepository.saveAll(List.of(
-                    ClassLevel.builder().name("Senior 1").levelOrder(1).build(),
-                    ClassLevel.builder().name("Senior 2").levelOrder(2).build(),
-                    ClassLevel.builder().name("Senior 3").levelOrder(3).build(),
-                    ClassLevel.builder().name("Senior 4").levelOrder(4).build(),
-                    ClassLevel.builder().name("Senior 5").levelOrder(5).build(),
-                    ClassLevel.builder().name("Senior 6").levelOrder(6).build()
+                    ClassLevel.builder().name("Primary 1").levelOrder(1).build(),
+                    ClassLevel.builder().name("Primary 2").levelOrder(2).build(),
+                    ClassLevel.builder().name("Primary 3").levelOrder(3).build(),
+                    ClassLevel.builder().name("Primary 4").levelOrder(4).build(),
+                    ClassLevel.builder().name("Primary 5").levelOrder(5).build(),
+                    ClassLevel.builder().name("Primary 6").levelOrder(6).build(),
+                    ClassLevel.builder().name("Primary 7").levelOrder(7).build()
                 ));
-                logger.info("✅ Seeded Class Levels (S1 - S6)");
+                logger.info("✅ Seeded Class Levels (P1 - P7)");
             }
 
             // --- Seed Subjects ---
             if (subjectRepository.count() == 0) {
                 subjectRepository.saveAll(List.of(
-                    Subject.builder().code("MTC").name("Mathematics").build(),
                     Subject.builder().code("ENG").name("English Language").build(),
-                    Subject.builder().code("PHY").name("Physics").build(),
-                    Subject.builder().code("CHM").name("Chemistry").build(),
-                    Subject.builder().code("BIO").name("Biology").build(),
-                    Subject.builder().code("GEO").name("Geography").build(),
-                    Subject.builder().code("HIS").name("History").build(),
-                    Subject.builder().code("CRE").name("Christian Religious Education").build(),
-                    Subject.builder().code("ICT").name("Information and Communications Technology").build()
+                    Subject.builder().code("MTC").name("Mathematics").build(),
+                    Subject.builder().code("SCI").name("Science").build(),
+                    Subject.builder().code("SST").name("Social Studies").build()
                 ));
                 logger.info("✅ Seeded Subjects");
             }
@@ -94,7 +90,7 @@ public class DataSeeder {
                 logger.info("✅ Seeded Academic Year 2026 with Terms");
             }
 
-            // --- Seed Grading Scale (Uganda O-Level style) ---
+            // --- Seed Grading Scale (Uganda Primary PLE style) ---
             if (gradingScaleRepository.count() == 0) {
                 gradingScaleRepository.saveAll(List.of(
                     GradingScale.builder().minMark(90).maxMark(100).grade("D1").points(1).comment("Distinction").build(),
@@ -107,7 +103,7 @@ public class DataSeeder {
                     GradingScale.builder().minMark(40).maxMark(44).grade("P8").points(8).comment("Pass").build(),
                     GradingScale.builder().minMark(0).maxMark(39).grade("F9").points(9).comment("Fail").build()
                 ));
-                logger.info("✅ Seeded Grading Scale (Uganda O-Level D1–F9)");
+                logger.info("✅ Seeded Grading Scale (Uganda Primary PLE style D1–F9)");
             }
 
             logger.info("=====================================================");

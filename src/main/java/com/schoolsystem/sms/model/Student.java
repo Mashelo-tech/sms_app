@@ -36,7 +36,7 @@ public class Student {
     
     private LocalDate enrollmentDate;
 
-    // The class the student is CURRENTLY in (e.g. "Senior 1")
+    // The class the student is CURRENTLY in (e.g. "Primary 1")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_class_id")
     private ClassLevel currentClass;
