@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure SMS – Enter Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --sidebar-width:250px; --sidebar-bg:#0f172a; --sidebar-accent:#3b82f6; }
+        body { background-color:#f1f5f9; font-family:'Segoe UI',system-ui,sans-serif; }
+        .sidebar { width:var(--sidebar-width); min-height:100vh; background:var(--sidebar-bg); position:fixed; top:0; left:0; display:flex; flex-direction:column; padding:1.5rem 1rem; z-index:100; }
+        .sidebar-brand { display:flex; align-items:center; gap:0.6rem; color:#fff; font-size:1.1rem; font-weight:700; text-decoration:none; margin-bottom:2rem; padding:0.5rem; }
+        .sidebar-brand .brand-icon { background:var(--sidebar-accent); width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#fff; flex-shrink:0; }
+        .nav-section-label { font-size:0.65rem; font-weight:700; letter-spacing:1px; color:#475569; text-transform:uppercase; padding:0.5rem 0.75rem; margin-top:1rem; }
+        .sidebar-nav .nav-link { color:#94a3b8; border-radius:8px; padding:0.65rem 0.75rem; margin-bottom:2px; display:flex; align-items:center; gap:0.65rem; font-size:0.875rem; font-weight:500; transition:all 0.15s; }
+        .sidebar-nav .nav-link:hover { color:#f1f5f9; background:rgba(255,255,255,0.07); }
+        .sidebar-nav .nav-link.active { color:#fff; background:var(--sidebar-accent); }
+        .sidebar-footer { margin-top:auto; padding-top:1rem; border-top:1px solid #1e293b; }
+        .user-pill { background:#1e293b; border-radius:10px; padding:0.75rem; margin-bottom:0.75rem; }
+        .user-pill .role-badge { font-size:0.65rem; font-weight:700; letter-spacing:0.5px; background:var(--sidebar-accent); color:#fff; padding:2px 7px; border-radius:99px; text-transform:uppercase; }
+        .main-content { margin-left:var(--sidebar-width); padding:2rem; min-height:100vh; }
+        .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+        .topbar h1 { font-size:1.5rem; font-weight:700; color:#0f172a; margin:0; }
+        .filter-card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+        .data-card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+        .data-card-header { padding:1rem 1.5rem; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
+        .data-card-header h5 { margin:0; font-size:0.9rem; font-weight:700; color:#334155; }
+        .table { margin:0; }
+        .table thead th { background:#f8fafc; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; border-bottom:1px solid #e2e8f0; padding:0.75rem 1rem; }
+        .table tbody td { padding:0.7rem 1rem; vertical-align:middle; border-color:#f1f5f9; font-size:0.875rem; color:#334155; }
+        .marks-input { width:90px; text-align:center; border-radius:6px; border:1px solid #cbd5e1; padding:0.3rem 0.5rem; font-size:0.875rem; font-weight:600; }
+        .marks-input:focus { outline:none; border-color:var(--sidebar-accent); box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+        .status-pill { display:inline-block; padding:2px 10px; border-radius:99px; font-size:0.7rem; font-weight:700; text-transform:uppercase; }
+        .status-DRAFT     { background:#f1f5f9; color:#475569; }
+        .status-SUBMITTED { background:#dbeafe; color:#1d4ed8; }
+        .status-APPROVED  { background:#dcfce7; color:#15803d; }
+        .status-RETURNED  { background:#fef3c7; color:#b45309; }
+        .status-LOCKED    { background:#e9d5ff; color:#7c3aed; }
+        .grade-cell { font-weight:700; font-size:0.85rem; }
+        .grade-D1,.grade-D2 { color:#15803d; }
+        .grade-C3,.grade-C4,.grade-C5,.grade-C6 { color:#2563eb; }
+        .grade-P7,.grade-P8 { color:#b45309; }
+        .grade-F9 { color:#dc2626; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════════════════ -->
+<div class="sidebar">
+    <a href="/" class="sidebar-brand">
+        <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+        Secure SMS
+    </a>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="/" class="nav-link" sec:authorize="hasAnyRole('DOS','SUPER_DOS','HEADTEACHER')"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/dashboard/teacher" class="nav-link" sec:authorize="hasRole('TEACHER')"><i class="bi bi-speedometer2"></i> My Dashboard</a>
+        <a href="/dashboard/secretary" class="nav-link" sec:authorize="hasRole('SECRETARY')"><i class="bi bi-speedometer2"></i> Dashboard</a>
+
+        <div class="nav-section-label">Academics</div>
+        <a href="/results" class="nav-link active"><i class="bi bi-pencil-square"></i> Enter Results</a>
+        <a href="/results/approve" class="nav-link" sec:authorize="hasAnyRole('DOS','SUPER_DOS','HEADTEACHER')">
+            <i class="bi bi-check2-circle"></i> Approve Results
+        </a>
+        <a href="/reports" class="nav-link"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a>
+        <a href="/teachers" class="nav-link" sec:authorize="hasAnyRole('DOS','SUPER_DOS','HEADTEACHER','SECRETARY')"><i class="bi bi-briefcase"></i> Manage Teachers</a>
+
+        <div class="nav-section-label" sec:authorize="hasAnyRole('SUPER_DOS','DOS','HEADTEACHER')">Admin</div>
+        <a href="/users" class="nav-link" sec:authorize="hasAnyRole('SUPER_DOS','DOS','HEADTEACHER')"><i class="bi bi-people"></i> System Users</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-pill">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-person-circle text-white fs-5"></i>
+                <span class="text-white fw-semibold small" th:text="${currentUser?.fullName ?: currentUsername}">User</span>
+            </div>
+            <span class="role-badge" th:text="${currentRole}">ROLE</span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ═══ MAIN CONTENT ══════════════════════════════════════════════════════ -->
+<div class="main-content">
+    <div class="topbar">
+        <h1><i class="bi bi-pencil-square me-2 text-primary"></i>Enter Exam Results</h1>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${errorMessage}" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- ─── FILTER PANEL ─────────────────────────────────────────────────── -->
+    <div class="filter-card">
+        <h6 class="text-muted fw-bold text-uppercase small mb-3"><i class="bi bi-funnel me-1"></i>Select Class, Subject &amp; Term</h6>
+        <form method="GET" action="/results" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small text-secondary text-uppercase">Class Level</label>
+                <select name="classId" class="form-select" required>
+                    <option value="" disabled th:selected="${selectedClassId == null}">Select Class…</option>
+                    <option th:each="cl : ${classLevels}"
+                            th:value="${cl.id}"
+                            th:text="${cl.name}"
+                            th:selected="${cl.id == selectedClassId}">Senior 1</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small text-secondary text-uppercase">Subject</label>
+                <select name="subjectId" class="form-select" required>
+                    <option value="" disabled th:selected="${selectedSubjectId == null}">Select Subject…</option>
+                    <option th:each="sub : ${subjects}"
+                            th:value="${sub.id}"
+                            th:text="${sub.name}"
+                            th:selected="${sub.id == selectedSubjectId}">Mathematics</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small text-secondary text-uppercase">Term</label>
+                <select name="termId" class="form-select" required>
+                    <option value="" disabled th:selected="${selectedTermId == null}">Select Term…</option>
+                    <option th:each="t : ${terms}"
+                            th:value="${t.id}"
+                            th:text="${t.name + ' — ' + t.academicYear.name}"
+                            th:selected="${t.id == selectedTermId}">Term 1</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ─── MARKS ENTRY GRID ─────────────────────────────────────────────── -->
+    <div th:if="${markBatch != null}">
+        <div class="data-card">
+            <div class="data-card-header">
+                <div>
+                    <h5>
+                        <i class="bi bi-table me-2"></i>
+                        Marks for
+                        <span class="text-primary fw-bold" th:text="${selectedClass?.name}">S1</span>
+                        — <span class="text-primary fw-bold" th:text="${selectedSubject?.name}">Mathematics</span>
+                        — <span class="text-secondary" th:text="${selectedTerm?.name + ' ' + selectedTerm?.academicYear?.name}">Term 2 2026</span>
+                    </h5>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-info text-dark" th:text="${markBatch.entries.size() + ' student(s)'}">0</span>
+                </div>
+            </div>
+
+            <form th:action="@{/results/save}" method="POST" th:object="${markBatch}" id="marksForm">
+                <input type="hidden" th:field="*{classLevelId}">
+                <input type="hidden" th:field="*{subjectId}">
+                <input type="hidden" th:field="*{termId}">
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Reg Number</th>
+                                <th>Student Name</th>
+                                <th class="text-center">Marks (0–100)</th>
+                                <th class="text-center">Grade</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="entry, iStat : *{entries}">
+                                <td class="text-muted" th:text="${iStat.count}">1</td>
+                                <td class="fw-bold text-primary" th:text="${entry.registrationNumber}">REG-001</td>
+                                <td th:text="${entry.studentName}">Jane Doe</td>
+                                <td class="text-center">
+                                    <input type="hidden" th:field="*{entries[__${iStat.index}__].studentId}">
+                                    <input type="hidden" th:field="*{entries[__${iStat.index}__].studentName}">
+                                    <input type="hidden" th:field="*{entries[__${iStat.index}__].registrationNumber}">
+                                    <input type="number"
+                                           th:field="*{entries[__${iStat.index}__].marks}"
+                                           class="marks-input"
+                                           min="0" max="100" step="0.5"
+                                           placeholder="—">
+                                </td>
+                                <!-- Grade & status from existing results -->
+                                <td class="text-center" th:each="r : ${existingResults}"
+                                    th:if="${r.student.id == entry.studentId}">
+                                    <span class="grade-cell" th:classappend="'grade-' + ${r.grade}" th:text="${r.grade ?: '—'}">—</span>
+                                </td>
+                                <td class="text-center" th:each="r : ${existingResults}"
+                                    th:if="${r.student.id == entry.studentId}">
+                                    <span class="status-pill" th:classappend="'status-' + ${r.status}" th:text="${r.status}">DRAFT</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${markBatch.entries.isEmpty()}">
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    No students enrolled in this class.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-3 border-top bg-light d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Enter marks (0–100). Leave blank to skip. Click <strong>Save Marks</strong> to store as DRAFT.
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" form="marksForm">
+                            <i class="bi bi-save me-1"></i> Save Marks
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Submit for Review (only for DRAFT/RETURNED results) -->
+        <div class="mt-3" th:if="${existingResults != null and !existingResults.isEmpty()}">
+            <div class="card border-0" style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border-radius:12px;">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                    <div class="text-white">
+                        <i class="bi bi-send me-2"></i>
+                        <strong>Submit for DOS Review</strong>
+                        <span class="ms-2 opacity-75 small">When all marks are entered, submit this batch for approval.</span>
+                    </div>
+                    <form th:action="@{/results/submit}" method="POST" class="d-flex gap-2 align-items-center">
+                        <input type="hidden" name="classId" th:value="${selectedClassId}">
+                        <input type="hidden" name="subjectId" th:value="${selectedSubjectId}">
+                        <input type="hidden" name="termId" th:value="${selectedTermId}">
+                        <th:block th:each="r : ${existingResults}">
+                            <input type="hidden" name="resultIds" th:value="${r.id}"
+                                   th:if="${r.status.name() == 'DRAFT' or r.status.name() == 'RETURNED'}">
+                        </th:block>
+                        <button type="submit" class="btn btn-light btn-sm fw-bold">
+                            <i class="bi bi-send-fill me-1"></i> Submit for Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placeholder when no filter selected -->
+    <div th:if="${markBatch == null}" class="text-center py-5 text-muted">
+        <i class="bi bi-table fs-1 d-block mb-3" style="color:#cbd5e1;"></i>
+        <p class="mb-0">Select a <strong>Class</strong>, <strong>Subject</strong>, and <strong>Term</strong> above to load the student marks grid.</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-highlight out-of-range inputs
+    document.querySelectorAll('.marks-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const val = parseFloat(this.value);
+            if (this.value !== '' && (val < 0 || val > 100)) {
+                this.style.borderColor = '#dc2626';
+                this.style.background = '#fef2f2';
+            } else {
+                this.style.borderColor = '';
+                this.style.background = '';
+            }
+        });
+    });
+</script>
+</body>
+</html>

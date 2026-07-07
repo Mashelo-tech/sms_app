@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure SMS – Class Broadsheet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --sidebar-width:250px; --sidebar-bg:#0f172a; --sidebar-accent:#3b82f6; }
+        body { background-color:#f1f5f9; font-family:'Segoe UI',system-ui,sans-serif; }
+        .sidebar { width:var(--sidebar-width); min-height:100vh; background:var(--sidebar-bg); position:fixed; top:0; left:0; display:flex; flex-direction:column; padding:1.5rem 1rem; z-index:100; }
+        .sidebar-brand { display:flex; align-items:center; gap:0.6rem; color:#fff; font-size:1.1rem; font-weight:700; text-decoration:none; margin-bottom:2rem; padding:0.5rem; }
+        .sidebar-brand .brand-icon { background:var(--sidebar-accent); width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#fff; flex-shrink:0; }
+        .nav-section-label { font-size:0.65rem; font-weight:700; letter-spacing:1px; color:#475569; text-transform:uppercase; padding:0.5rem 0.75rem; margin-top:1rem; }
+        .sidebar-nav .nav-link { color:#94a3b8; border-radius:8px; padding:0.65rem 0.75rem; margin-bottom:2px; display:flex; align-items:center; gap:0.65rem; font-size:0.875rem; font-weight:500; transition:all 0.15s; }
+        .sidebar-nav .nav-link:hover { color:#f1f5f9; background:rgba(255,255,255,0.07); }
+        .sidebar-nav .nav-link.active { color:#fff; background:var(--sidebar-accent); }
+        .sidebar-footer { margin-top:auto; padding-top:1rem; border-top:1px solid #1e293b; }
+        .user-pill { background:#1e293b; border-radius:10px; padding:0.75rem; margin-bottom:0.75rem; }
+        .user-pill .role-badge { font-size:0.65rem; font-weight:700; letter-spacing:0.5px; background:var(--sidebar-accent); color:#fff; padding:2px 7px; border-radius:99px; text-transform:uppercase; }
+        .main-content { margin-left:var(--sidebar-width); padding:2rem; }
+        .grade-D1,.grade-D2 { color:#15803d; font-weight:700; }
+        .grade-C3,.grade-C4,.grade-C5,.grade-C6 { color:#2563eb; font-weight:700; }
+        .grade-P7,.grade-P8 { color:#b45309; font-weight:700; }
+        .grade-F9 { color:#dc2626; font-weight:700; }
+        @media print {
+            .sidebar, .no-print { display:none!important; }
+            .main-content { margin-left:0; padding:1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar no-print">
+    <a href="/" class="sidebar-brand">
+        <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+        Secure SMS
+    </a>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="/" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <div class="nav-section-label">Academics</div>
+        <a href="/results" class="nav-link"><i class="bi bi-pencil-square"></i> Enter Results</a>
+        <a href="/results/approve" class="nav-link"><i class="bi bi-check2-circle"></i> Approve Results</a>
+        <a href="/reports" class="nav-link active"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-pill">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-person-circle text-white fs-5"></i>
+                <span class="text-white fw-semibold small" th:text="${currentUser?.fullName ?: currentUsername}">User</span>
+            </div>
+            <span class="role-badge" th:text="${currentRole}">ROLE</span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <div>
+            <a href="/reports" class="btn btn-outline-secondary btn-sm me-2">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Print Broadsheet
+        </button>
+    </div>
+
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div th:if="${broadsheet != null}">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h4 class="fw-bold mb-0">EXCELLENCE ACADEMY</h4>
+            <p class="text-muted mb-0">Class Broadsheet</p>
+            <h5 class="fw-bold mt-2">
+                <span th:text="${selectedClass?.name}">Class</span>
+                — <span th:text="${selectedTerm?.name}">Term</span>
+                <span th:text="${selectedTerm?.academicYear?.name}">2026</span>
+            </h5>
+        </div>
+
+        <!-- Broadsheet Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm" style="font-size:0.82rem;">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Pos.</th>
+                        <th>Reg No.</th>
+                        <th>Student Name</th>
+                        <th th:if="${!broadsheet.isEmpty() and !broadsheet[0].results.isEmpty()}"
+                            th:each="r : ${broadsheet[0].results}" th:text="${r.subject?.code}">SUB</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                        <th>Aggregate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="report : ${broadsheet}">
+                        <td class="fw-bold text-center" th:text="${report.position}">1</td>
+                        <td th:text="${report.student?.registrationNumber}">REG-001</td>
+                        <td class="fw-semibold" th:text="${report.student?.fullName}">Jane</td>
+                        <td th:each="r : ${report.results}" class="text-center">
+                            <div th:classappend="'grade-' + ${r.grade}" th:text="${r.grade}">D1</div>
+                            <div class="text-muted" style="font-size:0.7rem;" th:text="${r.marks}">85</div>
+                        </td>
+                        <td class="fw-bold text-center" th:text="${#numbers.formatDecimal(report.totalMarks, 1, 1)}">0</td>
+                        <td class="text-center" th:text="${#numbers.formatDecimal(report.averageMarks, 1, 1)}">0</td>
+                        <td class="fw-bold text-center text-primary">
+                            <!-- Sum of points = aggregate -->
+                            <span th:text="${report.totalPoints}">0</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${broadsheet.isEmpty()}">
+                        <td colspan="10" class="text-center text-muted py-4">
+                            No approved results found for this class and term.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:if="${broadsheet == null}" class="text-center py-5 text-muted">
+        <i class="bi bi-table fs-1 d-block mb-3" style="color:#cbd5e1;"></i>
+        Select a class and term to generate the broadsheet.
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

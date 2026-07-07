@@ -14,5 +14,6 @@ public class StudentReportDTO {
     private double totalMarks;
     private double averageMarks;
     private int position; // Rank in class
-    private String division; // Division 1, 2 etc. (if applicable)
+    private String division; // Division 1, 2 etc.
+    private int totalPoints; // Sum of all subject points (aggregate)
 }

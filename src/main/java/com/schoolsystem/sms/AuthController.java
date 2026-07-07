@@ -1,5 +1,6 @@
 package com.schoolsystem.sms;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -7,8 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AuthController {
 
     @GetMapping("/login")
-    public String showLoginPage() {
-        // This tells Spring to look for "login.html" in the templates folder
-        return "login"; 
+    public String showLoginPage(Authentication authentication) {
+        // If already logged in, redirect to dashboard
+        if (authentication != null && authentication.isAuthenticated()) {
+            return "redirect:/";
+        }
+        return "login";
     }
 }
