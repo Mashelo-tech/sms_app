@@ -25,7 +25,7 @@
     <nav class="sidebar-nav">
         <div class="nav-section-label">Main</div>
         <!-- Active state could be passed dynamically, but for simplicity we rely on JS or Thymeleaf conditional logic -->
-        <a href="/" class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">
+        <a href="/" class="nav-link" th:classappend="${requestURI == '/' ? 'active' : ''}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
 
@@ -33,18 +33,18 @@
         <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#studentModal">
             <i class="bi bi-person-plus"></i> Register Student
         </a>
-        <a href="/teachers" class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/teachers') ? 'active' : ''}">
+        <a href="/teachers" class="nav-link" th:classappend="${#strings.startsWith(requestURI != null ? requestURI : '', '/teachers') ? 'active' : ''}">
             <i class="bi bi-briefcase"></i> Manage Teachers
         </a>
-        <a href="/results" class="nav-link" sec:authorize="hasAnyRole('TEACHER','DOS','SUPER_DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/results') ? 'active' : ''}">
+        <a href="/results" class="nav-link" sec:authorize="hasAnyRole('TEACHER','DOS','SUPER_DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(requestURI != null ? requestURI : '', '/results') ? 'active' : ''}">
             <i class="bi bi-pencil-square"></i> Enter Results
         </a>
-        <a href="/reports" class="nav-link" sec:authorize="hasAnyRole('DOS','SUPER_DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/reports') ? 'active' : ''}">
+        <a href="/reports" class="nav-link" sec:authorize="hasAnyRole('DOS','SUPER_DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(requestURI != null ? requestURI : '', '/reports') ? 'active' : ''}">
             <i class="bi bi-file-earmark-bar-graph"></i> Reports
         </a>
 
         <div class="nav-section-label" sec:authorize="hasAnyRole('SUPER_DOS','DOS','HEADTEACHER')">Admin</div>
-        <a href="/users" class="nav-link" sec:authorize="hasAnyRole('SUPER_DOS','DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/users') ? 'active' : ''}">
+        <a href="/users" class="nav-link" sec:authorize="hasAnyRole('SUPER_DOS','DOS','HEADTEACHER')" th:classappend="${#strings.startsWith(requestURI != null ? requestURI : '', '/users') ? 'active' : ''}">
             <i class="bi bi-people"></i> System Users
         </a>
     </nav>
