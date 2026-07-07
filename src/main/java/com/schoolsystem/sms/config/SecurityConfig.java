@@ -45,16 +45,21 @@ public class SecurityConfig {
                 // Admin-only: User management
                 .requestMatchers("/users/**", "/register-user").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER")
 
-                // Teachers & above: Manage teachers (secretary can view, DOS+ can manage)
-                .requestMatchers("/teachers/**", "/register-teacher").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER", "SECRETARY")
+                // Teachers & above: Manage teachers (DOS+ can manage)
+                .requestMatchers("/teachers/**", "/register-teacher").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER")
 
                 // Results entry: Teachers and above
-                .requestMatchers("/results/**").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER", "TEACHER", "SECRETARY")
+                .requestMatchers("/results/**").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER", "TEACHER")
 
                 // Reports: All authenticated users
                 .requestMatchers("/reports/**").authenticated()
 
-                // Main dashboard: All authenticated
+                // Dashboards: Strict Role-Based Access
+                .requestMatchers("/dashboard/teacher").hasAnyRole("TEACHER", "SUPER_DOS", "DOS", "HEADTEACHER")
+                .requestMatchers("/dashboard/secretary").hasAnyRole("SECRETARY", "SUPER_DOS", "DOS", "HEADTEACHER")
+                .requestMatchers("/").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER")
+
+                // Fallback
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure SMS – Class Broadsheet</title>
+    <title>Secure SMS â€“ Class Broadsheet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -81,7 +81,7 @@
             <p class="text-muted mb-0">Class Broadsheet</p>
             <h5 class="fw-bold mt-2">
                 <span th:text="${selectedClass?.name}">Class</span>
-                — <span th:text="${selectedTerm?.name}">Term</span>
+                â€” <span th:text="${selectedTerm?.name}">Term</span>
                 <span th:text="${selectedTerm?.academicYear?.name}">2026</span>
             </h5>
         </div>
@@ -104,7 +104,7 @@
                 <tbody>
                     <tr th:each="report : ${broadsheet}">
                         <td class="fw-bold text-center" th:text="${report.position}">1</td>
-                        <td th:text="${report.student?.registrationNumber}">REG-001</td>
+                        <td th:text="${report.student?.registrationNumber}"></td>
                         <td class="fw-semibold" th:text="${report.student?.fullName}">Jane</td>
                         <td th:each="r : ${report.results}" class="text-center">
                             <div th:classappend="'grade-' + ${r.grade}" th:text="${r.grade}">D1</div>
