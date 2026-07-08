@@ -18,7 +18,7 @@ body {
     background-color: var(--bg-color);
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: var(--text-main);
-    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 /* ═══ Scrollbar Customization ═══ */
@@ -40,7 +40,8 @@ body {
 /* ═══ Sidebar ═══ */
 .sidebar {
     width: var(--sidebar-width);
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
     background: var(--card-bg);
     position: fixed;
     top: 0; left: 0;
@@ -99,7 +100,7 @@ body {
 }
 
 /* ═══ Main Content ═══ */
-.main-content { margin-left: var(--sidebar-width); padding: 3rem 4rem; min-height: 100vh; }
+.main-content { margin-left: var(--sidebar-width); padding: 3rem 4rem; height: 100vh; overflow-y: auto; }
 .topbar {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 3rem;

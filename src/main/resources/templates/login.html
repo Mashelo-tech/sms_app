@@ -10,30 +10,23 @@
 </head>
 <body>
 
-    <div class="split-layout">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
         
-        <div class="brand-section">
-            <div>
-                <span class="system-badge"><i class="bi bi-shield-lock-fill me-2"></i>Secure Access Portal</span>
-                <h1>Excellence Academy</h1>
-                <p>Welcome to the Secure School Management System. Please log in with your authorized credentials to access student records, grading broadsheets, and administrative tools.</p>
-            </div>
+        <div class="card p-5 shadow-lg border-0" style="max-width: 480px; width: 100%; border-radius: var(--border-radius);">
             
-            <div style="position: absolute; bottom: 2rem; opacity: 0.6; font-size: 0.85rem;">
-                &copy; <script>document.write(new Date().getFullYear())</script> Excellence Academy. All rights reserved.
-            </div>
-        </div>
-
-        <div class="form-section">
-            
-            <div class="d-block d-lg-none mb-4 text-center">
-                <h3 class="fw-bold" style="color: #0e1e40;">Excellence Academy</h3>
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <span class="system-badge d-inline-block px-3 py-1 rounded-pill" style="background: rgba(14, 30, 64, 0.05); color: var(--primary-color); font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(14, 30, 64, 0.1);">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Secure Access Portal
+                    </span>
+                </div>
+                <h3 class="fw-bold" style="color: var(--primary-color);">Excellence Academy</h3>
                 <p class="text-muted small">Secure Management System</p>
             </div>
 
-            <div class="mb-5">
-                <h2 class="fw-bold mb-2">Sign In</h2>
-                <p class="text-muted">Enter your username and password below.</p>
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1">Sign In</h4>
+                <p class="text-muted small">Enter your authorized credentials below.</p>
             </div>
 
             <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-4" role="alert">
@@ -69,10 +62,13 @@
                     </div>
                     <div class="input-group mt-2">
                         <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-key"></i></span>
-                        <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="password" name="password" placeholder="********" required>
-                        <button class="btn btn-outline-secondary border-start-0 bg-white text-muted" type="button" id="togglePassword" style="border-color: var(--border-color);">
-                            <i class="bi bi-eye" id="toggleIcon"></i>
-                        </button>
+                        <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="********" required>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="togglePasswordCheck">
+                        <label class="form-check-label text-muted small user-select-none" for="togglePasswordCheck">
+                            Show password
+                        </label>
                     </div>
                 </div>
                 
@@ -106,22 +102,22 @@
                 </div>
             </div>
             
+            <div class="text-center mt-4 text-muted" style="font-size: 0.75rem;">
+                &copy; <script>document.write(new Date().getFullYear())</script> Excellence Academy. All rights reserved.
+            </div>
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const togglePassword = document.querySelector('#togglePassword');
+        const togglePasswordCheck = document.querySelector('#togglePasswordCheck');
         const password = document.querySelector('#password');
-        const toggleIcon = document.querySelector('#toggleIcon');
 
-        togglePassword.addEventListener('click', function (e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        togglePasswordCheck.addEventListener('change', function (e) {
+            // toggle the type attribute based on checkbox state
+            const type = this.checked ? 'text' : 'password';
             password.setAttribute('type', type);
-            // toggle the eye / eye slash icon
-            toggleIcon.classList.toggle('bi-eye');
-            toggleIcon.classList.toggle('bi-eye-slash');
         });
     </script>
 </body>
