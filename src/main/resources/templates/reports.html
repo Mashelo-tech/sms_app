@@ -115,10 +115,31 @@
                     </div>
                 </div>
                 <form method="GET" action="/reports/student" class="row g-2">
-                    <div class="col-12">
-                        <input type="number" name="studentId" class="form-control" placeholder="Enter Student ID" min="1" required>
-                        <div class="form-text text-muted small">The numeric database ID of the student.</div>
+                    <div class="col-12 mb-2">
+                        <div class="btn-group w-100" role="group" aria-label="Report Scope">
+                            <input type="radio" class="btn-check" name="scope" id="scopeIndividual" value="INDIVIDUAL" checked onchange="toggleScope()">
+                            <label class="btn btn-outline-success btn-sm" for="scopeIndividual">Individual</label>
+
+                            <input type="radio" class="btn-check" name="scope" id="scopeClass" value="CLASS" onchange="toggleScope()">
+                            <label class="btn btn-outline-success btn-sm" for="scopeClass">By Class</label>
+
+                            <input type="radio" class="btn-check" name="scope" id="scopeSchool" value="SCHOOL" onchange="toggleScope()">
+                            <label class="btn btn-outline-success btn-sm" for="scopeSchool">Whole School</label>
+                        </div>
                     </div>
+
+                    <div class="col-12" id="divRegNumber">
+                        <input type="text" id="registrationNumber" name="registrationNumber" class="form-control" placeholder="Enter Full Registration Number" required>
+                        <div class="form-text text-muted small">e.g. REG/2026/001</div>
+                    </div>
+
+                    <div class="col-12 d-none" id="divClassId">
+                        <select id="classId" name="classId" class="form-select">
+                            <option value="" disabled selected>Select Class...</option>
+                            <option th:each="cl : ${classLevels}" th:value="${cl.id}" th:text="${cl.name}">S1</option>
+                        </select>
+                    </div>
+
                     <div class="col-12">
                         <select name="termId" class="form-select" required>
                             <option value="" disabled selected>Select Term...</option>
@@ -128,9 +149,9 @@
                                     th:selected="${t.id == activeTerm?.id}">Term</option>
                         </select>
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 mt-3">
                         <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-person-lines-fill me-2"></i>Generate Report Card
+                            <i class="bi bi-person-lines-fill me-2"></i>Generate Report(s)
                         </button>
                     </div>
                 </form>
@@ -139,5 +160,32 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleScope() {
+        const scope = document.querySelector('input[name="scope"]:checked').value;
+        const divReg = document.getElementById('divRegNumber');
+        const inputReg = document.getElementById('registrationNumber');
+        const divClass = document.getElementById('divClassId');
+        const inputClass = document.getElementById('classId');
+
+        if (scope === 'INDIVIDUAL') {
+            divReg.classList.remove('d-none');
+            inputReg.required = true;
+            divClass.classList.add('d-none');
+            inputClass.required = false;
+        } else if (scope === 'CLASS') {
+            divReg.classList.add('d-none');
+            inputReg.required = false;
+            divClass.classList.remove('d-none');
+            inputClass.required = true;
+        } else {
+            // SCHOOL
+            divReg.classList.add('d-none');
+            inputReg.required = false;
+            divClass.classList.add('d-none');
+            inputClass.required = false;
+        }
+    }
+</script>
 </body>
 </html>

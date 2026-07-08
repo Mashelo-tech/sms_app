@@ -28,7 +28,8 @@
         @media print {
             .sidebar, .no-print { display:none!important; }
             .main-content { margin-left:0; padding:0; }
-            .report-card-print { box-shadow:none; border:none; }
+            .report-card-print { box-shadow:none; border:none; page-break-after: always; }
+            .report-card-print:last-child { page-break-after: auto; }
         }
     </style>
 </head>
@@ -74,7 +75,8 @@
 
     <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-    <div th:if="${report != null}" class="report-card-print">
+    <div th:if="${reports != null and !reports.isEmpty()}">
+      <div th:each="report : ${reports}" class="report-card-print mb-5">
         <!-- School Header -->
         <div class="text-center border-bottom pb-3 mb-4">
             <h4 class="fw-bold mb-0">EXCELLENCE ACADEMY</h4>
@@ -164,11 +166,12 @@
                 <small class="text-muted">Head Teacher</small>
             </div>
         </div>
+      </div>
     </div>
 
-    <div th:if="${report == null and errorMessage == null}" class="text-center py-5 text-muted">
+    <div th:if="${(reports == null or reports.isEmpty()) and errorMessage == null}" class="text-center py-5 text-muted">
         <i class="bi bi-person-lines-fill fs-1 d-block mb-3" style="color:#cbd5e1;"></i>
-        No report to display. Go back and generate one.
+        No reports to display. Go back and generate one.
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
