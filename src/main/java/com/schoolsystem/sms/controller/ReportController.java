@@ -63,28 +63,64 @@ public class ReportController {
         return "reports-broadsheet";
     }
 
-    // ─── INDIVIDUAL STUDENT REPORT ────────────────────────────────────────────
+    // ─── STUDENT REPORTS (INDIVIDUAL / BULK) ───────────────────────────────────
     @GetMapping("/student")
     public String viewStudentReport(
-            @RequestParam Long studentId,
+            @RequestParam(required = false, defaultValue = "INDIVIDUAL") String scope,
+            @RequestParam(required = false) String registrationNumber,
+            @RequestParam(required = false) Long classId,
             @RequestParam Long termId,
             Model model,
             Authentication authentication) {
 
         addCommonAttributes(model, authentication);
         model.addAttribute("terms", termRepository.findAll());
-        model.addAttribute("students", studentRepository.findAll());
         model.addAttribute("selectedTermId", termId);
-        model.addAttribute("selectedStudentId", studentId);
-
-        studentRepository.findById(studentId).ifPresent(s -> model.addAttribute("selectedStudent", s));
         termRepository.findById(termId).ifPresent(t -> model.addAttribute("selectedTerm", t));
 
+        java.util.List<StudentReportDTO> reports = new java.util.ArrayList<>();
+
         try {
-            StudentReportDTO report = reportService.generateStudentReport(studentId, termId);
-            model.addAttribute("report", report);
+            if ("INDIVIDUAL".equalsIgnoreCase(scope)) {
+                if (registrationNumber == null || registrationNumber.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Registration Number is required for individual reports.");
+                }
+                var studentOpt = studentRepository.findByRegistrationNumber(registrationNumber.trim());
+                if (studentOpt.isEmpty()) {
+                    throw new IllegalArgumentException("No student found with Registration Number: " + registrationNumber);
+                }
+                reports.add(reportService.generateStudentReport(studentOpt.get().getId(), termId));
+
+            } else if ("CLASS".equalsIgnoreCase(scope)) {
+                if (classId == null) {
+                    throw new IllegalArgumentException("Class selection is required for class-level reports.");
+                }
+                var classOpt = classLevelRepository.findById(classId);
+                if (classOpt.isEmpty()) {
+                    throw new IllegalArgumentException("Selected class not found.");
+                }
+                var students = studentRepository.findByCurrentClass(classOpt.get());
+                for (var student : students) {
+                    try {
+                        reports.add(reportService.generateStudentReport(student.getId(), termId));
+                    } catch (Exception ignored) { } // Skip students who can't have a report generated
+                }
+
+            } else if ("SCHOOL".equalsIgnoreCase(scope)) {
+                var allStudents = studentRepository.findAll();
+                for (var student : allStudents) {
+                    try {
+                        reports.add(reportService.generateStudentReport(student.getId(), termId));
+                    } catch (Exception ignored) { }
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid scope provided.");
+            }
+
+            model.addAttribute("reports", reports);
+
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Could not generate report: " + e.getMessage());
+            model.addAttribute("errorMessage", "Could not generate report(s): " + e.getMessage());
         }
 
         return "reports-student";
