@@ -18,6 +18,9 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "tenant_id", nullable = false)
+    private java.util.UUID tenantId;
+
     @Column(nullable = false, unique = true)
     private String employeeId;
 

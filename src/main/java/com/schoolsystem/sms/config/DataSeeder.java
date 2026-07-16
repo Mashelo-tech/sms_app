@@ -20,6 +20,7 @@ public class DataSeeder {
 
     @Bean
     CommandLineRunner initDatabase(
+            TenantRepository tenantRepository,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             ClassLevelRepository classLevelRepository,
@@ -32,12 +33,26 @@ public class DataSeeder {
             logger.info("=====================================================");
             logger.info("SEEDING DATABASE...");
 
+            // --- Seed Default Tenant ---
+            Tenant defaultTenant;
+            if (tenantRepository.count() == 0) {
+                defaultTenant = Tenant.builder()
+                        .moesLicenseNumber("MOES/2026/001")
+                        .schoolName("Excellence Academy")
+                        .build();
+                defaultTenant = tenantRepository.save(defaultTenant);
+                logger.info("✅ Created default tenant: {}", defaultTenant.getSchoolName());
+            } else {
+                defaultTenant = tenantRepository.findAll().get(0);
+            }
+            java.util.UUID tenantId = defaultTenant.getId();
+
             // --- Seed Default Users (one per role) ---
-            seedUser(userRepository, passwordEncoder, "admin",       "admin123",     "System Administrator",    "admin@school.com",      Role.SUPER_DOS);
-            seedUser(userRepository, passwordEncoder, "dos",         "dos123",       "Director of Studies",     "dos@school.com",        Role.DOS);
-            seedUser(userRepository, passwordEncoder, "headteacher", "head123",      "Head Teacher",            "head@school.com",       Role.HEADTEACHER);
-            seedUser(userRepository, passwordEncoder, "secretary",   "secretary123", "School Secretary",        "secretary@school.com",  Role.SECRETARY);
-            seedUser(userRepository, passwordEncoder, "teacher1",    "teacher123",   "Mr. James Okello",        "jokello@school.com",    Role.TEACHER);
+            seedUser(userRepository, passwordEncoder, tenantId, "admin",       "admin123",     "System Administrator",    "admin@school.com",      Role.SUPER_DOS);
+            seedUser(userRepository, passwordEncoder, tenantId, "dos",         "dos123",       "Director of Studies",     "dos@school.com",        Role.DOS);
+            seedUser(userRepository, passwordEncoder, tenantId, "headteacher", "head123",      "Head Teacher",            "head@school.com",       Role.HEADTEACHER);
+            seedUser(userRepository, passwordEncoder, tenantId, "secretary",   "secretary123", "School Secretary",        "secretary@school.com",  Role.SECRETARY);
+            seedUser(userRepository, passwordEncoder, tenantId, "teacher1",    "teacher123",   "Mr. James Okello",        "jokello@school.com",    Role.TEACHER);
 
             // --- Seed Class Levels ---
             if (classLevelRepository.count() == 0) {
@@ -110,10 +125,11 @@ public class DataSeeder {
         };
     }
 
-    private void seedUser(UserRepository repo, PasswordEncoder encoder,
+    private void seedUser(UserRepository repo, PasswordEncoder encoder, java.util.UUID tenantId,
                           String username, String password, String fullName, String email, Role role) {
         if (repo.findByUsername(username).isEmpty()) {
             User user = User.builder()
+                    .tenantId(tenantId)
                     .username(username)
                     .password(encoder.encode(password))
                     .fullName(fullName)
