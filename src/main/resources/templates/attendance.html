@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <title>Mark Attendance</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="topbar">
+        <div>
+            <h1><i class="bi bi-calendar-check me-2 text-info"></i>Daily Attendance Register</h1>
+            <p class="text-muted small mb-0">Record student presence for today.</p>
+        </div>
+        <a href="/dashboard/teacher" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div th:if="${param.success}" class="alert alert-success d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+        <div>
+            <strong>Success!</strong><br>
+            <span class="small">Attendance has been recorded successfully.</span>
+        </div>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+        <div>
+            <strong>Error</strong><br>
+            <span class="small" th:text="${errorMessage}">Error occurred.</span>
+        </div>
+    </div>
+
+    <!-- Class Selection -->
+    <div class="data-card mb-4 p-4" style="background:#fff;">
+        <form method="GET" action="/attendance" class="row align-items-end g-3">
+            <div class="col-md-5">
+                <label for="classId" class="form-label">Select Class to Mark</label>
+                <select id="classId" name="classId" class="form-select" required onchange="this.form.submit()">
+                    <option value="" disabled selected>-- Choose Class --</option>
+                    <option th:each="c : ${classLevels}"
+                            th:value="${c.id}"
+                            th:text="${c.name}"
+                            th:selected="${selectedClass != null and selectedClass.id == c.id}">Class Name</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" th:value="${currentDate}" disabled style="background-color: #f8fafc; color: #64748b;">
+            </div>
+        </form>
+    </div>
+
+    <!-- Attendance Roster -->
+    <div class="data-card" th:if="${selectedClass != null}">
+        <div class="data-card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                Register for <span class="text-primary" th:text="${selectedClass.name}">Class</span>
+            </h5>
+            <span class="badge bg-secondary" th:text="${students.size() + ' Students'}">0 Students</span>
+        </div>
+
+        <form method="POST" action="/attendance">
+            <input type="hidden" name="classId" th:value="${selectedClass.id}">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 150px;">Reg Number</th>
+                            <th>Student Name</th>
+                            <th class="text-center" style="width: 300px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="student, stat : ${students}">
+                            <td th:text="${stat.count}">1</td>
+                            <td><code th:text="${student.registrationNumber}">REG/001</code></td>
+                            <td class="fw-bold" th:text="${student.fullName}">John Doe</td>
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'present_' + ${student.id}" value="PRESENT" checked>
+                                    <label class="btn btn-outline-success btn-sm" th:for="'present_' + ${student.id}">Present</label>
+
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'absent_' + ${student.id}" value="ABSENT">
+                                    <label class="btn btn-outline-danger btn-sm" th:for="'absent_' + ${student.id}">Absent</label>
+
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'excused_' + ${student.id}" value="EXCUSED">
+                                    <label class="btn btn-outline-warning btn-sm" th:for="'excused_' + ${student.id}">Excused</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${students == null or students.isEmpty()}">
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-3"></i>
+                                No students found in this class.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-3 bg-light border-top text-end" th:if="${students != null and !students.isEmpty()}">
+                <button type="submit" class="btn btn-primary px-5">
+                    <i class="bi bi-cloud-upload me-2"></i>Save Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
