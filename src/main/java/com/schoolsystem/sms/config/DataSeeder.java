@@ -27,7 +27,12 @@ public class DataSeeder {
             SubjectRepository subjectRepository,
             AcademicYearRepository academicYearRepository,
             TermRepository termRepository,
-            GradingScaleRepository gradingScaleRepository
+            GradingScaleRepository gradingScaleRepository,
+            ParentRepository parentRepository,
+            StudentRepository studentRepository,
+            TeacherRepository teacherRepository,
+            InvoiceRepository invoiceRepository,
+            PaymentRepository paymentRepository
     ) {
         return args -> {
             logger.info("=====================================================");
@@ -53,6 +58,20 @@ public class DataSeeder {
             seedUser(userRepository, passwordEncoder, tenantId, "headteacher", "head123",      "Head Teacher",            "head@school.com",       Role.HEADTEACHER);
             seedUser(userRepository, passwordEncoder, tenantId, "secretary",   "secretary123", "School Secretary",        "secretary@school.com",  Role.SECRETARY);
             seedUser(userRepository, passwordEncoder, tenantId, "teacher1",    "teacher123",   "Mr. James Okello",        "jokello@school.com",    Role.TEACHER);
+
+            // --- Seed Teacher ---
+            if (teacherRepository.count() == 0) {
+                Teacher teacher = Teacher.builder()
+                        .tenantId(tenantId)
+                        .employeeId("EMP001")
+                        .fullName("Mr. James Okello")
+                        .department("Science")
+                        .mainSubject("Mathematics")
+                        .active(true)
+                        .build();
+                teacherRepository.save(teacher);
+                logger.info("✅ Seeded Teacher");
+            }
 
             // --- Seed Class Levels ---
             if (classLevelRepository.count() == 0) {
@@ -119,6 +138,52 @@ public class DataSeeder {
                     GradingScale.builder().minMark(0).maxMark(39).grade("F9").points(9).comment("Fail").build()
                 ));
                 logger.info("✅ Seeded Grading Scale (Uganda Primary PLE style D1–F9)");
+            }
+
+            // --- Seed Parent, Student, Invoice, Payment ---
+            if (studentRepository.count() == 0) {
+                Parent parent = Parent.builder()
+                        .tenantId(tenantId)
+                        .fullName("John Doe Sr.")
+                        .primaryPhoneNumber("+256700000000")
+                        .build();
+                parent = parentRepository.save(parent);
+
+                Student student = Student.builder()
+                        .tenantId(tenantId)
+                        .registrationNumber("REG/2026/001")
+                        .fullName("John Doe Jr.")
+                        .gender("MALE")
+                        .dateOfBirth(LocalDate.of(2015, 1, 1))
+                        .enrollmentDate(LocalDate.now())
+                        .parent(parent)
+                        .build();
+
+                // Assign student to Primary 1 if it exists
+                classLevelRepository.findAll().stream()
+                        .filter(c -> c.getName().equals("Primary 1"))
+                        .findFirst()
+                        .ifPresent(student::setCurrentClass);
+
+                student = studentRepository.save(student);
+
+                Invoice invoice = Invoice.builder()
+                        .tenantId(tenantId)
+                        .student(student)
+                        .totalAmountIssued(new java.math.BigDecimal("500000.00"))
+                        .termName("Term 1 - 2026")
+                        .build();
+                invoice = invoiceRepository.save(invoice);
+
+                Payment payment = Payment.builder()
+                        .tenantId(tenantId)
+                        .invoice(invoice)
+                        .amountPaid(new java.math.BigDecimal("250000.00"))
+                        .transactionTimestamp(java.time.LocalDateTime.now())
+                        .build();
+                paymentRepository.save(payment);
+
+                logger.info("✅ Seeded Parent, Student, Invoice, and Payment");
             }
 
             logger.info("=====================================================");
