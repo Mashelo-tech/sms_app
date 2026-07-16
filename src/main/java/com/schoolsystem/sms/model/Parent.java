@@ -1,41 +1,36 @@
 package com.schoolsystem.sms.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "parents")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Parent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "tenant_id", nullable = false)
-    private java.util.UUID tenantId;
-
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
+    private UUID tenantId;
 
     @Column(nullable = false)
     private String fullName;
 
-    @Column(unique = true)
-    private String email;
-
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private String primaryPhoneNumber;
 
-    private boolean enabled = true;
+    private String nationalIdNumber;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private List<Student> dependents;
 }

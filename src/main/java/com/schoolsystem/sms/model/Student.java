@@ -22,6 +22,9 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "tenant_id", nullable = false)
+    private java.util.UUID tenantId;
+
     @NotBlank(message = "Registration Number cannot be empty")
     private String registrationNumber;
 
@@ -40,4 +43,8 @@ public class Student {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_class_id")
     private ClassLevel currentClass;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Parent parent;
 }
