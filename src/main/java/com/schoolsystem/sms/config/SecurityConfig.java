@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final TenantContextFilter tenantContextFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -37,6 +38,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authenticationProvider(authenticationProvider())
+            .addFilterAfter(tenantContextFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
