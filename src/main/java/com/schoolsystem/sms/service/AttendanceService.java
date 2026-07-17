@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface AttendanceService {
     void saveBatchAttendance(UUID tenantId, LocalDate date, Map<Long, AttendanceStatus> studentStatusMap);
+    Map<Long, AttendanceStatus> getAttendanceStatuses(UUID tenantId, LocalDate date, Long classId);
 }

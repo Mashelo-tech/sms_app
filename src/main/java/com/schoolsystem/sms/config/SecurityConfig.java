@@ -50,6 +50,9 @@ public class SecurityConfig {
                 // Teachers & above: Manage teachers (DOS+ can manage)
                 .requestMatchers("/teachers/**", "/register-teacher").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER")
 
+                // Teacher personal day-to-day tasks
+                .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "CLASS_TEACHER")
+
                 // Results entry: Teachers and above
                 .requestMatchers("/results/**").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER", "TEACHER")
 

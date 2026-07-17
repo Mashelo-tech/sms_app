@@ -54,27 +54,25 @@ public class TeacherController {
         }
     }
 
-    @GetMapping("/attendance")
-    public String viewAttendance(@RequestParam(required = false) Long classId,
-                                 Model model, Authentication authentication) {
-        addCommonAttributes(model, authentication);
-        model.addAttribute("classLevels", classLevelRepository.findAll());
-        model.addAttribute("currentDate", LocalDate.now());
-
+    @GetMapping("/teacher/attendance")
+    public String viewAttendanceRedirect(@RequestParam(required = false) Long classId,
+                                         @RequestParam(required = false) String date) {
+        String query = "";
         if (classId != null) {
-            classLevelRepository.findById(classId).ifPresent(c -> {
-                model.addAttribute("selectedClass", c);
-                model.addAttribute("students", studentRepository.findByCurrentClass(c));
-            });
+            query += "?classId=" + classId;
         }
 
-        return "attendance";
+        String targetDate = (date != null && !date.isEmpty()) ? date : LocalDate.now().toString();
+        query += (query.isEmpty() ? "?" : "&") + "date=" + targetDate;
+
+        return "redirect:/dashboard/teacher" + query;
     }
 
-    @PostMapping("/attendance")
+    @PostMapping("/teacher/attendance/save")
     public String saveAttendance(@RequestParam Long classId,
+                                 @RequestParam(required = false) String date,
                                  @RequestParam Map<String, String> allRequestParams,
-                                 Model model, Authentication authentication) {
+                                 Authentication authentication) {
 
         UUID tenantId = userService.findByUsername(authentication.getName())
                 .map(com.schoolsystem.sms.model.User::getTenantId)
@@ -94,13 +92,13 @@ public class TeacherController {
             }
         }
 
+        LocalDate targetDate = (date != null && !date.isEmpty()) ? LocalDate.parse(date) : LocalDate.now();
+
         try {
-            attendanceService.saveBatchAttendance(tenantId, LocalDate.now(), statusMap);
-            return "redirect:/attendance?classId=" + classId + "&success=true";
+            attendanceService.saveBatchAttendance(tenantId, targetDate, statusMap);
+            return "redirect:/dashboard/teacher?classId=" + classId + "&date=" + targetDate + "&success=true";
         } catch (Exception e) {
-            addCommonAttributes(model, authentication);
-            model.addAttribute("errorMessage", "Failed to save attendance: " + e.getMessage());
-            return viewAttendance(classId, model, authentication);
+            return "redirect:/dashboard/teacher?classId=" + classId + "&date=" + targetDate + "&error=Failed+to+save+attendance";
         }
     }
 

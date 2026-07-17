@@ -5,6 +5,7 @@ import com.schoolsystem.sms.model.User;
 import com.schoolsystem.sms.repository.*;
 import com.schoolsystem.sms.service.StudentService;
 import com.schoolsystem.sms.service.UserService;
+import com.schoolsystem.sms.service.AttendanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class DashboardController {
     private final AcademicYearRepository academicYearRepository;
     private final TermRepository termRepository;
     private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
+    private final AttendanceService attendanceService;
 
     // ─── MAIN ADMIN/DOS/HEADTEACHER DASHBOARD ───────────────────────────────
     @GetMapping("/")
@@ -55,7 +60,11 @@ public class DashboardController {
 
     // ─── TEACHER DASHBOARD ───────────────────────────────────────────────────
     @GetMapping("/dashboard/teacher")
-    public String viewTeacherDashboard(Model model, Authentication authentication) {
+    public String viewTeacherDashboard(@RequestParam(required = false) Long classId,
+                                       @RequestParam(required = false) String date,
+                                       @RequestParam(required = false) String error,
+                                       @RequestParam(required = false) String success,
+                                       Model model, Authentication authentication) {
         addCommonAttributes(model, authentication);
 
         // Get the logged-in user's assignments
@@ -68,6 +77,28 @@ public class DashboardController {
         model.addAttribute("subjects", subjectRepository.findAll());
         model.addAttribute("activeTerm", termRepository.findByActiveTrue().orElse(null));
         model.addAttribute("activeYear", academicYearRepository.findByActiveTrue().orElse(null));
+
+        LocalDate targetDate = (date != null && !date.isEmpty()) ? LocalDate.parse(date) : LocalDate.now();
+        model.addAttribute("currentDate", targetDate);
+
+        if (error != null) {
+            model.addAttribute("errorMessage", error);
+        }
+        if (success != null) {
+            model.addAttribute("success", true);
+        }
+
+        if (classId != null && currentUser.isPresent()) {
+            classLevelRepository.findById(classId).ifPresent(c -> {
+                model.addAttribute("selectedClass", c);
+                model.addAttribute("students", studentRepository.findByCurrentClass(c));
+
+                UUID tenantId = currentUser.get().getTenantId();
+                if (tenantId != null) {
+                    model.addAttribute("attendanceMap", attendanceService.getAttendanceStatuses(tenantId, targetDate, classId));
+                }
+            });
+        }
 
         return "dashboard-teacher";
     }

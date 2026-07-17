@@ -15,6 +15,22 @@
         </div>
     </div>
 
+    <div th:if="${success}" class="alert alert-success d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+        <div>
+            <strong>Success!</strong><br>
+            <span class="small">Attendance has been recorded successfully.</span>
+        </div>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+        <div>
+            <strong>Error</strong><br>
+            <span class="small" th:text="${errorMessage}">Error occurred.</span>
+        </div>
+    </div>
+
     <!-- Context Bar -->
     <div class="context-bar">
         <div class="context-item">
@@ -66,28 +82,21 @@
     <div class="mb-4">
         <h6 class="text-muted fw-bold text-uppercase small mb-3">Quick Actions</h6>
         <div class="row g-3">
-            <div class="col-md-3">
-                <a href="/attendance" class="action-card" style="text-decoration:none; display:flex; flex-direction:column; background:#fff; padding:1.5rem; border-radius:12px; border:1px solid #e2e8f0;">
-                    <div class="ac-icon text-info" style="font-size:1.75rem;"><i class="bi bi-calendar-check"></i></div>
-                    <div class="ac-title" style="font-weight:700; color:#0f172a;">Mark Attendance</div>
-                    <div class="ac-desc" style="font-size:0.8rem; color:#64748b;">Take daily register for your assigned classes.</div>
-                </a>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <a href="/results" class="action-card" style="text-decoration:none; display:flex; flex-direction:column; background:#fff; padding:1.5rem; border-radius:12px; border:1px solid #e2e8f0;">
                     <div class="ac-icon text-success" style="font-size:1.75rem;"><i class="bi bi-pencil-square"></i></div>
                     <div class="ac-title" style="font-weight:700; color:#0f172a;">Enter Exam Results</div>
                     <div class="ac-desc" style="font-size:0.8rem; color:#64748b;">Enter marks for your assigned classes and subjects.</div>
                 </a>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <a href="/reports" class="action-card" style="text-decoration:none; display:flex; flex-direction:column; background:#fff; padding:1.5rem; border-radius:12px; border:1px solid #e2e8f0;">
                     <div class="ac-icon text-primary" style="font-size:1.75rem;"><i class="bi bi-file-earmark-bar-graph"></i></div>
                     <div class="ac-title" style="font-weight:700; color:#0f172a;">View Class Reports</div>
                     <div class="ac-desc" style="font-size:0.8rem; color:#64748b;">View student report cards and class broadsheets.</div>
                 </a>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <a href="/results?status=DRAFT" class="action-card" style="text-decoration:none; display:flex; flex-direction:column; background:#fff; padding:1.5rem; border-radius:12px; border:1px solid #e2e8f0;">
                     <div class="ac-icon text-warning" style="font-size:1.75rem;"><i class="bi bi-clock-history"></i></div>
                     <div class="ac-title" style="font-weight:700; color:#0f172a;">Pending Submissions</div>
@@ -95,6 +104,88 @@
                 </a>
             </div>
         </div>
+    </div>
+
+    <!-- Class Selection -->
+    <div class="data-card mb-4 p-4" style="background:#fff;">
+        <div class="data-card-header mb-3 pb-0 border-0">
+            <h5><i class="bi bi-calendar-check me-2 text-info"></i>Daily Attendance Register</h5>
+        </div>
+        <form method="GET" action="/teacher/attendance" class="row align-items-end g-3">
+            <div class="col-md-5">
+                <label for="classId" class="form-label">Select Class to Mark</label>
+                <select id="classId" name="classId" class="form-select" required onchange="this.form.submit()">
+                    <option value="" disabled selected>-- Choose Class --</option>
+                    <option th:each="c : ${classLevels}"
+                            th:value="${c.id}"
+                            th:text="${c.name}"
+                            th:selected="${selectedClass != null and selectedClass.id == c.id}">Class Name</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" class="form-control" th:value="${currentDate}" onchange="this.form.submit()">
+            </div>
+        </form>
+    </div>
+
+    <!-- Attendance Roster -->
+    <div class="data-card mb-4" th:if="${selectedClass != null}">
+        <div class="data-card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                Register for <span class="text-primary" th:text="${selectedClass.name}">Class</span>
+            </h5>
+            <span class="badge bg-secondary" th:text="${students.size() + ' Students'}">0 Students</span>
+        </div>
+
+        <form method="POST" action="/teacher/attendance/save">
+            <input type="hidden" name="classId" th:value="${selectedClass.id}">
+            <input type="hidden" name="date" th:value="${currentDate}">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 150px;">Reg Number</th>
+                            <th>Student Name</th>
+                            <th class="text-center" style="width: 300px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="student, stat : ${students}">
+                            <td th:text="${stat.count}">1</td>
+                            <td><code th:text="${student.registrationNumber}">REG/001</code></td>
+                            <td class="fw-bold" th:text="${student.fullName}">John Doe</td>
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'present_' + ${student.id}" value="PRESENT" th:checked="${attendanceMap == null or attendanceMap.get(student.id) == null or attendanceMap.get(student.id).name() == 'PRESENT'}">
+                                    <label class="btn btn-outline-success btn-sm" th:for="'present_' + ${student.id}">Present</label>
+
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'absent_' + ${student.id}" value="ABSENT" th:checked="${attendanceMap != null and attendanceMap.get(student.id) != null and attendanceMap.get(student.id).name() == 'ABSENT'}">
+                                    <label class="btn btn-outline-danger btn-sm" th:for="'absent_' + ${student.id}">Absent</label>
+
+                                    <input type="radio" class="btn-check" th:name="'status_' + ${student.id}" th:id="'excused_' + ${student.id}" value="EXCUSED" th:checked="${attendanceMap != null and attendanceMap.get(student.id) != null and attendanceMap.get(student.id).name() == 'EXCUSED'}">
+                                    <label class="btn btn-outline-warning btn-sm" th:for="'excused_' + ${student.id}">Excused</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${students == null or students.isEmpty()}">
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-3"></i>
+                                No students found in this class.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-3 bg-light border-top text-end" th:if="${students != null and !students.isEmpty()}">
+                <button type="submit" class="btn btn-primary px-5">
+                    <i class="bi bi-cloud-upload me-2"></i>Save Attendance
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- My Assignments Table -->

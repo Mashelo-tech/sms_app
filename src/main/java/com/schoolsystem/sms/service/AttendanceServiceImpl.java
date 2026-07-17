@@ -24,8 +24,23 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final StudentRepository studentRepository;
 
     @Override
+    public Map<Long, AttendanceStatus> getAttendanceStatuses(UUID tenantId, LocalDate date, Long classId) {
+        List<AttendanceRecord> records = attendanceRecordRepository.findByTenantIdAndDateAndStudentCurrentClassId(tenantId, date, classId);
+        Map<Long, AttendanceStatus> statuses = new java.util.HashMap<>();
+        for (AttendanceRecord record : records) {
+            statuses.put(record.getStudent().getId(), record.getStatus());
+        }
+        return statuses;
+    }
+
+    @Override
     @Transactional
     public void saveBatchAttendance(UUID tenantId, LocalDate date, Map<Long, AttendanceStatus> studentStatusMap) {
+        // Delete existing records for these students on this date to prevent duplicates
+        if (!studentStatusMap.isEmpty()) {
+            attendanceRecordRepository.deleteByTenantIdAndDateAndStudentIdIn(tenantId, date, new ArrayList<>(studentStatusMap.keySet()));
+        }
+
         List<AttendanceRecord> records = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
