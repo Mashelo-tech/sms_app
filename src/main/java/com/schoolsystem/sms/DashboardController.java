@@ -6,6 +6,7 @@ import com.schoolsystem.sms.repository.*;
 import com.schoolsystem.sms.service.StudentService;
 import com.schoolsystem.sms.service.UserService;
 import com.schoolsystem.sms.service.AttendanceService;
+import com.schoolsystem.sms.service.FinanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,8 @@ public class DashboardController {
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
     private final AttendanceService attendanceService;
+    private final FinanceService financeService;
+    private final InvoiceRepository invoiceRepository;
 
     // ─── MAIN ADMIN/DOS/HEADTEACHER DASHBOARD ───────────────────────────────
     @GetMapping("/")
@@ -105,7 +108,10 @@ public class DashboardController {
 
     // ─── SECRETARY DASHBOARD ─────────────────────────────────────────────────
     @GetMapping("/dashboard/secretary")
-    public String viewSecretaryDashboard(Model model, Authentication authentication,
+    public String viewSecretaryDashboard(@RequestParam(required = false) String success,
+                                         @RequestParam(required = false) String paymentSuccess,
+                                         @RequestParam(required = false) String error,
+                                         Model model, Authentication authentication,
                                          @RequestParam(defaultValue = "1") int page) {
         addCommonAttributes(model, authentication);
 
@@ -117,6 +123,34 @@ public class DashboardController {
         model.addAttribute("totalPages", studentPage.getTotalPages());
         model.addAttribute("totalStudents", studentPage.getTotalElements());
         model.addAttribute("classLevels", classLevelRepository.findAll());
+
+        Optional<User> currentUser = userService.findByUsername(authentication.getName());
+        if (currentUser.isPresent() && currentUser.get().getTenantId() != null) {
+            UUID tenantId = currentUser.get().getTenantId();
+            java.util.Map<Long, java.math.BigDecimal> balancesMap = new java.util.HashMap<>();
+            java.util.Map<Long, java.util.List<com.schoolsystem.sms.model.Invoice>> openInvoicesMap = new java.util.HashMap<>();
+
+            for (Student student : studentPage.getContent()) {
+                balancesMap.put(student.getId(), financeService.getOutstandingBalance(tenantId, student.getId()));
+
+                java.util.List<com.schoolsystem.sms.model.Invoice> invoices = invoiceRepository.findByTenantIdAndStudentId(tenantId, student.getId());
+                openInvoicesMap.put(student.getId(), invoices.stream().filter(inv -> inv.getTotalAmountIssued().compareTo(inv.getTotalAmountPaid()) > 0).toList());
+            }
+
+            model.addAttribute("balancesMap", balancesMap);
+            model.addAttribute("openInvoicesMap", openInvoicesMap);
+        }
+
+        if (success != null) {
+            // Keep original success functionality for registration
+            model.addAttribute("success", true);
+        }
+        if (paymentSuccess != null) {
+            model.addAttribute("successMessage", paymentSuccess);
+        }
+        if (error != null) {
+            model.addAttribute("errorMessage", error);
+        }
 
         if (!model.containsAttribute("student")) {
             model.addAttribute("student", new Student());

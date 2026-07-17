@@ -56,6 +56,9 @@ public class SecurityConfig {
                 // Results entry: Teachers and above
                 .requestMatchers("/results/**").hasAnyRole("SUPER_DOS", "DOS", "HEADTEACHER", "TEACHER")
 
+                // Bursar/Fee tracking
+                .requestMatchers("/bursar/**").hasAnyRole("HEADTEACHER", "SUPER_DOS", "BURSAR", "ACCOUNTANT", "SECRETARY")
+
                 // Reports: All authenticated users
                 .requestMatchers("/reports/**").authenticated()
 
